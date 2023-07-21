@@ -77,13 +77,22 @@ void ShaderProgram::Run() const
 	}
 }
 
-void ShaderProgram::SetUniformTransform(glm::mat4 Transform)
+void ShaderProgram::SetUniformTransform(const char* TransformName, glm::mat4 Transform)
 {
 	// find the uniform variable in the shader by name
-	int UniformLoc = glGetUniformLocation(ProgramID, "Transform");
+	int UniformLoc = glGetUniformLocation(ProgramID, TransformName);
 
 	// We change the value
 	glUniformMatrix4fv(UniformLoc, 1, GL_FALSE, value_ptr(Transform));
+}
+
+void ShaderProgram::SetUniformInt(const char* ShaderVariableName, int Value)
+{
+	// find the uniform variable by name
+	int UniformLoc = glGetUniformLocation(ProgramID, ShaderVariableName);
+
+	// we change the value
+	glUniform1i(UniformLoc, Value);
 }
 
 NovoUint ShaderProgram::CreateShader(NovoShaderTypes ShaderType, const NovoString& FilePath)

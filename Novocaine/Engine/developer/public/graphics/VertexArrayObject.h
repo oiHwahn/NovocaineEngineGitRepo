@@ -7,17 +7,17 @@ struct ShapeMatrices;
 
 struct NovoVertex {
 	// we assign a postion to the class variable on initialisation
-	NovoVertex(glm::vec3 inposition, glm::vec3 incolour) : position(inposition), colour(incolour) {}
+	NovoVertex(glm::vec3 inposition, glm::vec2 intexcoords) : position(inposition), texcoords(intexcoords) {}
 
 	glm::vec3 position; // x,y,z, position in world space of the vertex
-	glm::vec3 colour;
+	glm::vec2 texcoords; // x, y or (u,v) position on the texture map for the vertex
 
 	static TArray<NovoVertex> ConvertShapeMatrix(ShapeMatrices Shape);
 };
 
 class VertexArrayObject {
 public:
-	VertexArrayObject(const TArray<NovoVertex>& vertexData, const TArray<NovoUint>& indexData, const NovoUint RowSize = 6);
+	VertexArrayObject(const TArray<NovoVertex>& vertexData, const TArray<NovoUint>& indexData);
 	~VertexArrayObject();
 
 	// save the vertex data into a format that is readable by open GL shaders, that format is called an attribute pointer

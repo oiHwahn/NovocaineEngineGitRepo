@@ -2,7 +2,9 @@
 #include "glew/glew.h"
 #include "graphics/ShapeMatrices.h"
 
-VertexArrayObject::VertexArrayObject(const TArray<NovoVertex>& vertexData, const TArray<NovoUint>& indexData, const NovoUint RowSize)
+#define VERTEX_SIZE 5
+
+VertexArrayObject::VertexArrayObject(const TArray<NovoVertex>& vertexData, const TArray<NovoUint>& indexData)
 	: VertexData(vertexData), IndexData(indexData)
 {
 	VaoID = VboID = EabID = 0;
@@ -26,10 +28,10 @@ VertexArrayObject::VertexArrayObject(const TArray<NovoVertex>& vertexData, const
 	// save the data in the vertex matrix to a readable format for shaders
 	// point to the positions in the vertex matrix
 	// find the positions in the matrix
-	SetAttributePointer(0, 3, GL_FLOAT, RowSize * sizeof(float), 0);
+	SetAttributePointer(0, 3, GL_FLOAT, VERTEX_SIZE * sizeof(float), 0);
 	
-	// store the colours for the shader
-	SetAttributePointer(4, 3, GL_FLOAT, RowSize * sizeof(float), (void*) (3 * sizeof(float)));
+	// store the texture coordinates for the shader
+	SetAttributePointer(1, 2, GL_FLOAT, VERTEX_SIZE * sizeof(float), (void*) (3 * sizeof(float)));
 
  
 	// once everything is set clear the VAO from the VAO slot
@@ -107,23 +109,21 @@ TArray<NovoVertex> NovoVertex::ConvertShapeMatrix(ShapeMatrices Shape)
 	// create a local array
 	TArray<NovoVertex> VertexArray;
 	
-	// loop every 3 positions since we know a vertex is made up of 3 numbers (x, y, z)
-	for (NovoUint i = 0; i < Shape.Data.size(); i += Shape.RowSize) {
-		// assign the number based on the index + its relevant value
+	// loop and get each vertex position and its related texture coordinate
+	for (NovoUint i = 0; i < Shape.Positions.size(); i++) {
 		// this will get position
 		glm::vec3 vPosition = glm::vec3(
-			Shape.Data[i], 
-			Shape.Data[i + 1], 
-			Shape.Data[i + 2]);
+			Shape.Positions[i].x, 
+			Shape.Positions[i].y, 
+			Shape.Positions[i].z);
 
-		// this will get colour
-		glm::vec3 vColour = glm::vec3(
-			Shape.Data[i + 3],     
-			Shape.Data[i + 4], 
-			Shape.Data[i + 5]); 
+		// this will get ctje texture coordinates for the vertex
+		glm::vec2 vTexCoords = glm::vec2(
+			Shape.TexCoords[i].x,
+			Shape.TexCoords[i].y);
 
 		// add the position into the vertex array
-		VertexArray.push_back(NovoVertex(vPosition, vColour));
+		VertexArray.push_back(NovoVertex(vPosition, vTexCoords));
 	}
 
 	return VertexArray;

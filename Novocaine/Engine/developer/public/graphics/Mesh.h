@@ -2,12 +2,12 @@
 #include "CoreMinimal.h"
 #include "NovoTransform.h"
 
-
 struct NovoVertex; 
 struct NovoTransform;
 class VertexArrayObject;
 class ShaderProgram;
 struct ShapeMatrices;
+class Texture;
 
 class Mesh {
 public:
@@ -24,6 +24,9 @@ public:
 
 	// store and change the transformation of the mesh
 	NovoTransform Transform;
+
+	// debug texture for testing simple shader
+	Texture* BaseColour;
 
 
 private:

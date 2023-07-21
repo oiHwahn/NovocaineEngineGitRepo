@@ -1,4 +1,9 @@
-﻿  GraphicsEngine.cpp
+﻿  Game.cpp
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\public\Input.h(10,48): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\public\Input.h(13,43): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\public\Input.h(13,69): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  GraphicsEngine.cpp
+  Generating Code...
   Novocaine.vcxproj -> C:\Users\Juan.JUAN\source\repos\Novocaine\x64\Debug\Novocaine.exe
   C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\dependencies\dll\glew32.dll
   C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\dependencies\dll\SDL2.dll

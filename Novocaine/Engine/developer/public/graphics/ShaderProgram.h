@@ -31,7 +31,11 @@ public:
 	NovoUint GetID() const { return ProgramID; }
 
 	// this will change the "Transform" shader variable
-	void SetUniformTransform(glm::mat4 Transform);
+	void SetUniformTransform(const char* TransformName, glm::mat4 Transform); 
+
+	// this will alow us to change integer values in shaders
+	// sampler2 take an integer
+	void SetUniformInt(const char* ShaderVariableName, int Value);
 
 private:
 	// creates the individual shaders based on their type

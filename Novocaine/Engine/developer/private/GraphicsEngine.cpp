@@ -3,21 +3,27 @@
 #include "glew/glew.h"
 #include "CoreMinimal.h"
 #include "graphics/ShaderProgram.h"
+#include "graphics/Camera.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 // DEBUG INCLUDES
 #include "graphics/ShapeMatrices.h" 
 #include "graphics/Mesh.h"
 #include "NovoTransform.h"
+#include "graphics/Texture.h"
 
 GraphicsEngine::GraphicsEngine()
 {
 	Window = nullptr;
 	Renderer = nullptr;
 	VCShader = nullptr;
+	TexShader = nullptr;
+	DefaultEngineTexture = nullptr;
+	CurrentCamera = nullptr;
 
 	// debug 
-	TriMesh = nullptr;
-	PolyMesh = nullptr;
+	CubeMesh = nullptr;
+
 }
 
 GraphicsEngine::~GraphicsEngine()
@@ -50,8 +56,8 @@ bool GraphicsEngine::Initialise()
 		"Novocaine Engine | An OpenGL Engine",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		900,
-		900,
+		1280,
+		720,
 		WindowFlags
 	);
 
@@ -86,137 +92,19 @@ bool GraphicsEngine::Initialise()
 
 	}
 
-	VCShader = new ShaderProgram();
+	// Activate the ability to read depth in OpenGL
+	glEnable(GL_DEPTH_TEST);
 
-	
-	// importing the shaders from their files
-	//vertex shader
-	NovoShaderInfo VShader(
-		NovoShaderTypes::VERTEX,
-		"Engine/developer/shaders/VColour/VColour.novovshader"
-	);
+	// Initialise the engine shaders
+	InitEngineShaders();
 
-	// frament shader
-	NovoShaderInfo FShader(
-		NovoShaderTypes::FRAGMENT,
-		"Engine/developer/shaders/VColour/VColour.novofshader"
-	);
+	// Create a default camera
+	CurrentCamera = new Camera(0.0f, 0.0f, 0.0f);
 
-	// load the shader
-	// faill if it didnt work
-	if (!VCShader->LoadShaders({ VShader, FShader })) {
-		delete VCShader;
-		NOVO_MSG_ERR("Graphics Engine", "Vetex colour shade failed.");
-
-		return false;
-	}
+	DefaultEngineTexture = GetTexture("Engine/developer/textures/T_NovoDefaultTexture.png");
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	// DEBUG INITIALISE MESHES
-	PolyMesh = CreateShapeMesh(novosm::Polygon, VCShader);
-	Poly2Mesh = CreateShapeMesh(novosm::Polygon, VCShader);
-	TriMesh = CreateShapeMesh(novosm::Triangle, VCShader);
-	Star1Mesh = CreateShapeMesh(novosm::Star1, VCShader);
-	Star2Mesh = CreateShapeMesh(novosm::Star2, VCShader);
-
-	// Circle Pieces
-	Pizza1Mesh = CreateShapeMesh(novosm::Triangle, VCShader);
-	Pizza2Mesh = CreateShapeMesh(novosm::Triangle, VCShader);
-	Pizza3Mesh = CreateShapeMesh(novosm::Triangle, VCShader);
-	Pizza4Mesh = CreateShapeMesh(novosm::Triangle, VCShader);
-
-	Pizza5Mesh = CreateShapeMesh(novosm::Triangle2, VCShader);
-	Pizza6Mesh = CreateShapeMesh(novosm::Triangle2, VCShader);
-	Pizza7Mesh = CreateShapeMesh(novosm::Triangle2, VCShader);
-	Pizza8Mesh = CreateShapeMesh(novosm::Triangle2, VCShader);
-	
-	// Geometric Shapes Repositions
-
-	if (TriMesh != nullptr) {
-		TriMesh->Transform.Location.x = 0.5f;
-		TriMesh->Transform.Location.y = 0.5f;
-		TriMesh->Transform.Scale = glm::vec3(0.15f);
-	}
-
-	if (PolyMesh != nullptr) {
-		PolyMesh->Transform.Location.x = -0.5f;
-		PolyMesh->Transform.Location.y = -0.5f;
-		PolyMesh->Transform.Scale = glm::vec3(0.15f);
-		PolyMesh->Transform.Rotation.z = 45.0f;
-	}
-
-	if (Poly2Mesh != nullptr) {
-		Poly2Mesh->Transform.Location.x = -0.5f;
-		Poly2Mesh->Transform.Location.y = 0.5f;
-		Poly2Mesh->Transform.Scale = glm::vec3(0.15f);
-		Poly2Mesh->Transform.Rotation.z = 45.0f;
-	}
-
-	if (Star1Mesh != nullptr) {
-		Star1Mesh->Transform.Location.x = 0.5f;
-		Star1Mesh->Transform.Location.y = -0.6f;
-		Star1Mesh->Transform.Scale = glm::vec3(0.15f);
-		Star1Mesh->Transform.Rotation.z = -125.0f;
-	}
-
-	if (Star2Mesh != nullptr) {
-		Star2Mesh->Transform.Location.x = 0.47f;
-		Star2Mesh->Transform.Location.y = -0.5f;
-		Star2Mesh->Transform.Scale = glm::vec3(0.15f);
-	}
-
-	// Circle Repositions
-
-	if (Pizza1Mesh != nullptr) {
-		Pizza1Mesh->Transform.Location = glm::vec3(0.0f, 0.25f, 0.0f);
-		Pizza1Mesh->Transform.Scale = glm::vec3(0.5f);
-		Pizza1Mesh->Transform.Rotation.z = 180.0f;
-	}
-
-	if (Pizza2Mesh != nullptr) {
-		Pizza2Mesh->Transform.Location = glm::vec3(0.0f, -0.25f, 0.0f);
-		Pizza2Mesh->Transform.Scale = glm::vec3(0.5f);
-	}
-
-	if (Pizza3Mesh != nullptr) {
-		Pizza3Mesh->Transform.Location = glm::vec3(0.25f, 0.0f, 0.0f);
-		Pizza3Mesh->Transform.Scale = glm::vec3(0.5f);
-		Pizza3Mesh->Transform.Rotation.z = 90.0f;
-
-	}
-
-	if (Pizza4Mesh != nullptr) {
-		Pizza4Mesh->Transform.Location = glm::vec3(-0.25f, 0.0f, 0.0f);
-		Pizza4Mesh->Transform.Scale = glm::vec3(0.5f);
-		Pizza4Mesh->Transform.Rotation.z = -90.0f;
-
-	}
-
-	if (Pizza5Mesh != nullptr) {
-		Pizza5Mesh->Transform.Location = glm::vec3(-0.19f, 0.19f, 0.0f);
-		Pizza5Mesh->Transform.Scale = glm::vec3(0.36f, 0.52f, 0.0f);
-		Pizza5Mesh->Transform.Rotation.z = -135.0f;
-	}
-
-	if (Pizza6Mesh != nullptr) {
-		Pizza6Mesh->Transform.Location = glm::vec3(0.19f, -0.19f, 0.0f);
-		Pizza6Mesh->Transform.Scale = glm::vec3(0.36f, 0.52f, 0.0f);
-		Pizza6Mesh->Transform.Rotation.z = 45.0f;
-	}
-
-	if (Pizza7Mesh != nullptr) {
-		Pizza7Mesh->Transform.Location = glm::vec3(-0.19f, -0.19f, 0.0f);
-		Pizza7Mesh->Transform.Scale = glm::vec3(0.36f, 0.52f, 0.0f);
-		Pizza7Mesh->Transform.Rotation.z = -45.0f;
-	}
-
-	if (Pizza8Mesh != nullptr) {
-		Pizza8Mesh->Transform.Location = glm::vec3(0.19f, 0.19f, 0.0f);
-		Pizza8Mesh->Transform.Scale = glm::vec3(0.36f, 0.52f, 0.0f);
-		Pizza8Mesh->Transform.Rotation.z = 135.0f;
-	}
-
+   
 	return true;
 }
 
@@ -236,32 +124,30 @@ void GraphicsEngine::ClearGraphics()
 	glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
 
 	// clear the screen
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsEngine::DrawGraphics()
 {
 	// TODO: Draw 3d objects to the screen
-	
-	if (TriMesh != nullptr) {
-		TriMesh->Transform.Rotation.z += 0.005f;
-	}
-
-	if (Poly2Mesh != nullptr) {
-		Poly2Mesh->Transform.Rotation.z += 1.0f;
-	}
 
 	// loop through all of the meshstack elements
 	for (Mesh* LMesh : MeshStack) {
 		LMesh->Draw();
 	}
 
+	ApplyWorldTransforms();
 }
 
 void GraphicsEngine::PresentGraphics()
 {
 	// present the opengl renderer to the window
 	SDL_GL_SwapWindow(Window);
+}
+
+void GraphicsEngine::Update()
+{
+	CurrentCamera->Update();
 }
 
 Mesh* GraphicsEngine::CreateShapeMesh(ShapeMatrices Shape, ShaderProgram* Shader)
@@ -280,5 +166,129 @@ Mesh* GraphicsEngine::CreateShapeMesh(ShapeMatrices Shape, ShaderProgram* Shader
 	MeshStack.push_back(NewMesh);
 
 	return NewMesh;
+}
+
+Mesh* GraphicsEngine::Create3DShape(ShapeMatrices Shape)
+{
+	return CreateShapeMesh(Shape, TexShader);
+}
+
+Texture* GraphicsEngine::GetTexture(const char* FilePath)
+{
+	// loop through the textures and see if one already exist with the same path
+	for (Texture* LTexture : TextureStack) {
+		// if the filepath is the same then just exit the function and return the texture
+		// strcmp is the better way to constant char* of strings and returns 0 if its a match
+		if (strcmp(LTexture->GetFilePath(), FilePath) == 0) {
+			return LTexture;
+		}
+	}
+
+	// if there is no texture found then create a new one
+	Texture* NewTexture = new Texture();
+
+	// import the texture but delete it if it doesnt work
+	if (!NewTexture->ImportTexture(FilePath)) {
+		delete NewTexture;
+		return nullptr;
+	}
+
+	// if all is successful, add the texture to the texture stack to make sure we dont get another
+	TextureStack.push_back(NewTexture);
+
+	return NewTexture;
+} 
+
+
+bool GraphicsEngine::InitEngineShaders()
+{	
+	// create the vc shader
+	VCShader = new ShaderProgram();
+
+	// importing the shaders from their files
+	//vertex shader
+	NovoShaderInfo VShader(
+		NovoShaderTypes::VERTEX,
+		"Engine/developer/shaders/VColour/VColour.novovshader"
+	);
+
+	// frament shader
+	NovoShaderInfo FShader(
+		NovoShaderTypes::FRAGMENT,
+		"Engine/developer/shaders/VColour/VColour.novofshader"
+	);
+
+	// load the shader
+	// fail if it didnt work
+	if (!VCShader->LoadShaders({ VShader, FShader })) {
+		delete VCShader;
+		NOVO_MSG_ERR("Graphics Engine", "Vertex colour shader failed.");
+
+		return false;
+	}
+	//////////////////////////////////////////////
+	TexShader = new ShaderProgram();
+
+	// import the vertex shader
+	VShader = NovoShaderInfo(
+		NovoShaderTypes::VERTEX,
+		"Engine/developer/shaders/Texture/Texture.novovshader"
+	);
+
+	// import the fragment shader
+	FShader = NovoShaderInfo(
+		NovoShaderTypes::FRAGMENT,
+		"Engine/developer/shaders/Texture/Texture.novofshader" 
+	);
+
+	if (!TexShader->LoadShaders({VShader, FShader})) {
+		delete TexShader;
+		NOVO_MSG_ERR("Graphics Engine", "Texture Shader failed");
+
+		return false;
+	}
+
+	return true;
+}
+
+void GraphicsEngine::ApplyWorldTransforms()
+{
+	// hold the width and height of the window
+	int WWidth, WHeight = 0;
+
+	// Get the window and change our width and height variables to the screen size
+	SDL_GetWindowSize(GetWindow(), &WWidth, &WHeight);
+
+	// convert the screen size into and aspect ration
+	float AspectRatio = static_cast<float>(WWidth) / static_cast<float>(std::max(WHeight, 1));
+
+	// create the view and projection transforms
+	glm::mat4 view(1.0f); // view = glm::mat4(1.0f);
+	glm::mat4 projection(1.0f);
+
+	// create the view coordinates based on the camera location
+	// LookAt params
+	// @param1 - Camera Location
+	// @param2 - Camera Focus (Where camera should look)
+	// @param3 - Camera local up vector
+	view = glm::lookAt(
+		CurrentCamera->Transform.Location,
+		CurrentCamera->Transform.Location + CurrentCamera->Transform.GetForward(),
+		CurrentCamera->Transform.GetUp()
+	);
+
+	// create the world coordinates from the screen
+	// otherwise known as perspective view
+	projection = glm::perspective(
+		glm::radians(CurrentCamera->FOV),
+		AspectRatio,
+		CurrentCamera->NearClip,
+		CurrentCamera->FarClip
+	);
+
+	// add the coordinates to the texture shader
+	TexShader->SetUniformTransform("View", view);
+	TexShader->SetUniformTransform("Projection", projection);
+
 }
  

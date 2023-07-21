@@ -1,6 +1,9 @@
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\engine\developer\private\Game.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Game.obj
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\engine\developer\private\GraphicsEngine.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\GraphicsEngine.obj
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\graphics\Camera.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Camera.obj
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\graphics\Mesh.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Mesh.obj
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\graphics\ShaderProgram.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\ShaderProgram.obj
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\graphics\Texture.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Texture.obj
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\graphics\VertexArrayObject.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\VertexArrayObject.obj
+C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\Engine\developer\private\Input.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Input.obj
 C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\engine\Source.cpp;C:\Users\Juan.JUAN\source\repos\Novocaine\Novocaine\x64\Debug\Source.obj
