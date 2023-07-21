@@ -1,0 +1,15 @@
+#version 460 core 
+
+// getting the attribute pointer at the 0 location (vertex positions for us)
+layout(location = 0) in vec3 InPosition;
+layout(location = 4) in vec3 InColour;
+
+out vec3 VertexColour;
+
+uniform mat4 Transform = mat4(1.0f); // mat4 (1.0f, 1.0f, 1.0f, 1.0f)
+
+void main() {
+	gl_Position = Transform * vec4(InPosition, 1.0f);
+
+	VertexColour = InColour;
+}
